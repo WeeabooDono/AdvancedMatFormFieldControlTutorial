@@ -1,3 +1,14 @@
-.advanced-search-control {
-  // empty
+.app-advanced-search-control {
+  display: flex;
+
+  .select {
+    max-width: 150px;
+    margin-left: 0.5rem;
+  }
+
+  .divider {
+    height: 1em;
+    color: currentColor;
+    margin: 0 0.75rem;
+  }
 }

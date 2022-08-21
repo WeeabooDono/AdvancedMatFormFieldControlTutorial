@@ -1,1 +1,8 @@
-Hello custom component
+<mat-select class="select">
+  <mat-option [value]="''">Tous</mat-option>
+  <mat-option [value]="'fr'">France</mat-option>
+  <mat-option [value]="'en'">Angleterre</mat-option>
+  <mat-option [value]="'us'">États-Unis</mat-option>
+</mat-select>
+<mat-divider [vertical]="true" class="divider"></mat-divider>
+<input matInput class="input" type="text" name="advanced-search-input"/>
