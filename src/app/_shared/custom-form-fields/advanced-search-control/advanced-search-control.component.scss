@@ -15,4 +15,10 @@
     color: currentColor;
     margin: 0 0.75rem;
   }
+
+  .custom-advanced-search-placeholder {
+    position: absolute;
+    margin-left: calc(150px + 2rem);
+    opacity: 40%;
+  }
 }

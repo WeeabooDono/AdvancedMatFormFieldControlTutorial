@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DoCheck,
@@ -15,7 +16,15 @@ import {
 } from '@angular/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormFieldValue } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.model';
-import { ControlValueAccessor, FormBuilder, FormGroup, FormGroupDirective, NgControl, NgForm } from '@angular/forms';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  FormBuilder,
+  FormGroup,
+  FormGroupDirective,
+  NgControl,
+  NgForm,
+} from '@angular/forms';
 import { Subject } from 'rxjs';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
@@ -79,7 +88,7 @@ const _SearchInputMixinBase = mixinErrorState(SearchInputBase);
 })
 export class AdvancedSearchControlComponent
   extends _SearchInputMixinBase
-  implements OnInit, DoCheck, OnChanges, OnDestroy, MatFormFieldControl<FormFieldValue>, ControlValueAccessor {
+  implements OnInit, DoCheck, AfterViewInit, OnChanges, OnDestroy, MatFormFieldControl<FormFieldValue>, ControlValueAccessor {
   /**
    * Ce champ va correspondre au prochain id à ajouter à la classe de notre `AdvancedSearchControlComponent`.
    */
@@ -89,6 +98,12 @@ export class AdvancedSearchControlComponent
 
   @ViewChild(MatInput, { read: ElementRef, static: true })
   private _inputRef!: ElementRef;
+
+  @ViewChild(MatInput)
+  private _input!: MatInput;
+
+  @ViewChild('customPlaceholder')
+  private _customPlaceholderRef!: ElementRef;
 
   /**
    * Ajoute une classe pour identifier le composant dans le `MatFormField`.
@@ -112,6 +127,10 @@ export class AdvancedSearchControlComponent
    * Le formulaire interne.
    */
   public form: FormGroup;
+
+  get queryCtrl(): AbstractControl | null {
+    return this.form.get('query');
+  }
 
   /**
    * fonction de callback pour le onChange
@@ -144,6 +163,7 @@ export class AdvancedSearchControlComponent
    * @private Le placeholder du composant, si le control n'est pas 'touched', le placeholder ne s'affichera pas.
    */
   private _placeholder?: string;
+  private _matLabel?: Element | null;
 
   @Input()
   set placeholder(placeholder: string) {
@@ -270,6 +290,10 @@ export class AdvancedSearchControlComponent
     });
   }
 
+  public ngAfterViewInit(): void {
+    this._matLabel = document.querySelector('.app-advanced-search-control + .mat-form-field-label-wrapper mat-label');
+  }
+
   /**
    * On veut qu'à chaque changement, on notifie angular qu'il y a eu une modification.
    */
@@ -283,6 +307,10 @@ export class AdvancedSearchControlComponent
   public ngDoCheck(): void {
     if (this.ngControl) {
       this.updateErrorState();
+    }
+
+    if (this._customPlaceholderRef && !this._customPlaceholderRef.nativeElement.innerText && this._matLabel) {
+      this._customPlaceholderRef.nativeElement.innerText = this._matLabel.innerHTML + (this._required ? ' *' : '');
     }
   }
 
@@ -323,5 +351,11 @@ export class AdvancedSearchControlComponent
   public ngOnDestroy() {
     this._focusMonitor.stopMonitoring(this._inputRef);
     this.stateChanges.complete();
+  }
+
+  public canDisplay(): boolean {
+    return (this.queryCtrl && !this.queryCtrl.value)!
+      && !(this.errorState && !!this._matLabel)
+      && !(this.focused && !this.errorState && !!this._matLabel);
   }
 }

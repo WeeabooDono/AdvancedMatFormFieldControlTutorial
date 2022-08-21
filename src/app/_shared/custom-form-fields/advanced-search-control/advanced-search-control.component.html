@@ -8,7 +8,9 @@
   <mat-divider [vertical]="true" class="divider"></mat-divider>
   <input matInput class="input"
          (focusout)="_onFocusOut()"
+         [placeholder]="placeholder"
          type="text"
          name="advanced-search-input"
          formControlName="query"/>
+  <span *ngIf="canDisplay()" class="custom-advanced-search-placeholder" #customPlaceholder></span>
 </ng-container>
