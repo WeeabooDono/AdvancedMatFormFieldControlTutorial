@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DoCheck,
   ElementRef,
   HostBinding,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Optional,
@@ -13,15 +15,44 @@ import {
 } from '@angular/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormFieldValue } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.model';
-import { ControlValueAccessor, FormBuilder, FormGroup, NgControl } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, FormGroup, FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 import { MatInput } from '@angular/material/input';
-import { ErrorStateMatcher } from '@angular/material/core';
+import { ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
 import {
-  AdvancedSearchControlErrorStateMatcher
+  AdvancedSearchControlErrorStateMatcher,
 } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.error-state-matcher';
+
+class SearchInputBase {
+  /**
+   * Émet chaque fois que l'état du composant change et doit entraîner la mise à jour du champ de formulaire parent.
+   * Utilisé avec les `MatFormFieldControl`.
+   */
+  readonly stateChanges = new Subject<void>();
+
+  constructor(
+    public _defaultErrorStateMatcher: ErrorStateMatcher,
+    public _parentForm: NgForm,
+    public _parentFormGroup: FormGroupDirective,
+    /**
+     * Formulaire lié au composant.
+     * Utilisé avec les  `MatFormFieldControl`.
+     */
+    public ngControl: NgControl,
+  ) {
+  }
+}
+
+/**
+ * Un mixin pour ajouter la gestion des erreurs dans notre composant.
+ *
+ * Pour faire simple un mixin est une classe que l'on va faire hériter à une autre qui peut être utilisé à la fois pour
+ * instancier de nouveaux objets et pour étendre d'autres classes.
+ * Au lieu d'avoir une hiérarchie entre les deux classes, c'est le composant d'une classe pour en faire une plus grosse.
+ */
+const _SearchInputMixinBase = mixinErrorState(SearchInputBase);
 
 @Component({
   selector: 'app-advanced-search',
@@ -46,7 +77,9 @@ import {
     },
   ],
 })
-export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFormFieldControl<FormFieldValue>, ControlValueAccessor {
+export class AdvancedSearchControlComponent
+  extends _SearchInputMixinBase
+  implements OnInit, DoCheck, OnChanges, OnDestroy, MatFormFieldControl<FormFieldValue>, ControlValueAccessor {
   /**
    * Ce champ va correspondre au prochain id à ajouter à la classe de notre `AdvancedSearchControlComponent`.
    */
@@ -55,7 +88,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   @HostBinding('class.app-advanced-search-control') public isAppAdvancedSearch: boolean = true;
 
   @ViewChild(MatInput, { read: ElementRef, static: true })
-  private _inputRef: ElementRef;
+  private _inputRef!: ElementRef;
 
   /**
    * Ajoute une classe pour identifier le composant dans le `MatFormField`.
@@ -94,12 +127,6 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   };
 
   /**
-   * Cet observable est utilisé pour notifié qu'il y a un changement. En effet, le `ChangeDetection`
-   * des `MatFormFieldControl` est `OnPush`.
-   */
-  public stateChanges: Subject<void> = new Subject<void>();
-
-  /**
    * Plus besoin de value interne, on utilise le formulaire interne.
    */
   @Input()
@@ -116,7 +143,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   /**
    * @private Le placeholder du composant, si le control n'est pas 'touched', le placeholder ne s'affichera pas.
    */
-  private _placeholder: string;
+  private _placeholder?: string;
 
   @Input()
   set placeholder(placeholder: string) {
@@ -125,13 +152,13 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   get placeholder(): string {
-    return this._placeholder;
+    return this._placeholder || '';
   }
 
   /**
    * @private Permet de déterminer si le control est requis.
    */
-  private _required: boolean;
+  private _required: boolean = false;
 
   @Input()
   set required(required: BooleanInput) {
@@ -145,7 +172,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   /**
    * @private Permet de déterminer si le control est désactivé.
    */
-  private _disabled: boolean;
+  private _disabled: boolean = false;
 
   @Input()
   set disabled(disabled: BooleanInput) {
@@ -157,14 +184,6 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
 
   get disabled(): boolean {
     return this._disabled;
-  }
-
-  /**
-   * Permet de déterminer si le control est en erreur ou pas.
-   */
-  get errorState(): boolean {
-    // on retourne l'état du formulaire parent
-    return this._defaultErrorStateMatcher.isErrorState(this.ngControl.control, null);
   }
 
   /**
@@ -180,23 +199,18 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   /**
-   * Permet de déterminer si le control est dans l'état autofill ou pas.
-   * Si la propriété n'est pas présente, le control est considéré comme non autofill.
-   *
-   * Pour ce tutoriel, on se contentera de commenter cette partie. Je n'ai pas trouvé de cas d'usage pour cet élément.
-   */
-  // readonly autofilled?: boolean;
-
-  /**
-   * Un nom optionel qui permet de distinguer les différents `mat-form-field` selon leur type de control.
+   * Un nom optionnel qui permet de distinguer les différents `mat-form-field` selon leur type de control.
    * le formulaire ajoutera une class `mat-form-field-type-{{controlType}}` à son élément de base.
    */
   readonly controlType?: string = 'app-advanced-search-form-field';
 
   constructor(private _focusMonitor: FocusMonitor,
               private _fb: FormBuilder,
-              private _defaultErrorStateMatcher: ErrorStateMatcher,
+              public _defaultErrorStateMatcher: ErrorStateMatcher,
+              @Optional() public _parentForm: NgForm,
+              @Optional() public _parentFormGroup: FormGroupDirective,
               @Optional() @Self() public ngControl: NgControl) {
+    super(_defaultErrorStateMatcher, _parentForm, _parentFormGroup, ngControl);
     // On initialise le formulaire interne
     this.form = this._fb.group({
       scope: null,
@@ -246,7 +260,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   /**
-   * Dans cette partie on veut monitorer notre input text afin de changer l'état à focus quand on clic
+   * Dans cette partie, on veut monitorer notre input text afin de changer l'état à focus quand on clic
    * sur le formulaire.
    */
   public ngOnInit() {
@@ -257,10 +271,19 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   /**
-   * On veut qu'à chaque changements, on notifie angular qu'il y a eu une modification.
+   * On veut qu'à chaque changement, on notifie angular qu'il y a eu une modification.
    */
   public ngOnChanges() {
     this.stateChanges.next();
+  }
+
+  /**
+   * On va utiliser cet étape du cycle de vie pour uptade l'état de l'erreur.
+   */
+  public ngDoCheck(): void {
+    if (this.ngControl) {
+      this.updateErrorState();
+    }
   }
 
   /**
@@ -286,7 +309,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   /**
-   * Une fonction custom qui permet de donner le status touched au blur.
+   * Une fonction custom qui permet de donner le status 'touched' au blur.
    */
   public _onFocusOut(): void {
     this.onTouched();
@@ -294,9 +317,8 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
     this.stateChanges.next();
   }
 
-
   /**
-   * On n'oublis surtout pas de terminer les souscriptions.
+   * On n'oublie surtout pas de terminer les souscriptions.
    */
   public ngOnDestroy() {
     this._focusMonitor.stopMonitoring(this._inputRef);
