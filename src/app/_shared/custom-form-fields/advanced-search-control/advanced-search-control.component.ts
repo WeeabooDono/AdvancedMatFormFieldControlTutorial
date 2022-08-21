@@ -19,6 +19,9 @@ import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 import { MatInput } from '@angular/material/input';
 import { ErrorStateMatcher } from '@angular/material/core';
+import {
+  AdvancedSearchControlErrorStateMatcher
+} from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.error-state-matcher';
 
 @Component({
   selector: 'app-advanced-search',
@@ -29,11 +32,17 @@ import { ErrorStateMatcher } from '@angular/material/core';
   /**
    * On va dire à Angular que l'on va lui fournir un objet de type `MatFormFieldControl` à travers notre control
    * customisé `AdvancedSearchControlComponent`.
+   *
+   * On ajoute un ErrorStateMatcher custom pour avoir le comportement désiré.
    */
   providers: [
     {
       provide: MatFormFieldControl,
       useExisting: AdvancedSearchControlComponent,
+    },
+    {
+      provide: ErrorStateMatcher,
+      useClass: AdvancedSearchControlErrorStateMatcher,
     },
   ],
 })
