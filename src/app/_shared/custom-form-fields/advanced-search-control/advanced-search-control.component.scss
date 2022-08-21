@@ -1,6 +1,10 @@
 .app-advanced-search-control {
   display: flex;
 
+  &:not(.floated) + .mat-form-field-label-wrapper {
+    opacity: 0;
+  }
+
   .select {
     max-width: 150px;
     margin-left: 0.5rem;

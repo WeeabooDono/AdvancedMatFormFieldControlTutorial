@@ -10,7 +10,9 @@
 
   <mat-form-field appearance="outline">
     <mat-label>Rechercher une ville</mat-label>
+    <mat-icon matPrefix [ngClass]="{'disabled-icon': searchCtrl?.disabled }">search</mat-icon>
     <app-advanced-search formControlName="search"></app-advanced-search>
+    <mat-error>{{ searchErrorMessage }}</mat-error>
   </mat-form-field>
 
   <button mat-raised-button>Soumettre</button>

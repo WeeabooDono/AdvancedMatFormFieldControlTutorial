@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [HomeComponent],
@@ -17,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     ReactiveFormsModule,
     MatButtonModule,
+    CommonModule,
   ],
 })
 export class HomeModule {

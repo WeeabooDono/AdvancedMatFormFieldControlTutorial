@@ -6,16 +6,19 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  Optional,
+  Self,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormFieldValue } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.model';
-import { AbstractControlDirective, ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, FormGroup, NgControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
 import { MatInput } from '@angular/material/input';
+import { ErrorStateMatcher } from '@angular/material/core';
 
 @Component({
   selector: 'app-advanced-search',
@@ -31,11 +34,6 @@ import { MatInput } from '@angular/material/input';
     {
       provide: MatFormFieldControl,
       useExisting: AdvancedSearchControlComponent,
-    },
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: AdvancedSearchControlComponent,
-      multi: true,
     },
   ],
 })
@@ -69,24 +67,41 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   public userAriaDescribedBy?: string;
 
   /**
+   * Le formulaire interne.
+   */
+  public form: FormGroup;
+
+  /**
+   * fonction de callback pour le onChange
+   * @param _ la valeur transmise au control
+   */
+  private onChange = (_: FormFieldValue | null) => {
+  };
+
+  /**
+   * fonction de callback pour le onTouched
+   */
+  private onTouched = () => {
+  };
+
+  /**
    * Cet observable est utilisé pour notifié qu'il y a un changement. En effet, le `ChangeDetection`
    * des `MatFormFieldControl` est `OnPush`.
    */
   public stateChanges: Subject<void> = new Subject<void>();
 
   /**
-   * @private Un élément indispendable qui permet de bind notre entrée aux données dans le control.
+   * Plus besoin de value interne, on utilise le formulaire interne.
    */
-  private _value: FormFieldValue;
-
   @Input()
   set value(value: FormFieldValue) {
-    this._value = value;
+    this.form.patchValue(value);
+    this.onChange(value); // related to the control value accessor onChange
     this.stateChanges.next();
   }
 
   get value(): FormFieldValue {
-    return this._value;
+    return this.form.value;
   }
 
   /**
@@ -126,6 +141,8 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   @Input()
   set disabled(disabled: BooleanInput) {
     this._disabled = coerceBooleanProperty(disabled);
+    // le formulaire interne doit etre disable aussi
+    this.form.disable();
     this.stateChanges.next();
   };
 
@@ -134,9 +151,12 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   }
 
   /**
-   * Permet de déterminer si le control est en erreur ou pas. Pour cette étape du tutoriel, on le met à false.
+   * Permet de déterminer si le control est en erreur ou pas.
    */
-  public errorState: boolean = false;
+  get errorState(): boolean {
+    // on retourne l'état du formulaire parent
+    return this._defaultErrorStateMatcher.isErrorState(this.ngControl.control, null);
+  }
 
   /**
    * Donne l'information sur l'état du control, si il a le focus ou pas.
@@ -164,20 +184,32 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
    */
   readonly controlType?: string = 'app-advanced-search-form-field';
 
-  /**
-   * L'`AbstractControlDirective` du control. Pour cette étape du tutoriel, on le laisse à null.
-   */
-  readonly ngControl: NgControl | AbstractControlDirective | null = null;
+  constructor(private _focusMonitor: FocusMonitor,
+              private _fb: FormBuilder,
+              private _defaultErrorStateMatcher: ErrorStateMatcher,
+              @Optional() @Self() public ngControl: NgControl) {
+    // On initialise le formulaire interne
+    this.form = this._fb.group({
+      scope: null,
+      query: null,
+    });
 
-  constructor(private _focusMonitor: FocusMonitor) {
+    // On veut notifier un changement à chaque fois que les valeurs du formulaire interne changent.
+    this.form.valueChanges.subscribe(value => this.onChange(value));
+
+    if (this.ngControl != null) {
+      // On set le valueAccessor à travers le constructeur (au lieu des providers) pour ne pas tomber sur
+      // des imports circulaires.
+      this.ngControl.valueAccessor = this;
+    }
   }
 
   /**
    * Cette méthode va permettre de définir comment écrire les valeurs.
    * @param obj ce qui est renvoyé par l'élément du formulaire.
    */
-  public writeValue(obj: any): void {
-    // empty
+  public writeValue(obj: FormFieldValue): void {
+    this.value = obj;
   }
 
   /**
@@ -185,7 +217,7 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
    * @param fn la fonction de callback.
    */
   public registerOnChange(fn: any): void {
-    // empty
+    this.onChange = fn;
   }
 
   /**
@@ -193,7 +225,15 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
    * @param fn la fonction de callback.
    */
   public registerOnTouched(fn: any): void {
-    // empty
+    this.onTouched = fn;
+  }
+
+  /**
+   * Methode non obligatoire qui permet de définir le status 'disabled' du control.
+   * @param isDisabled
+   */
+  public setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
   /**
@@ -219,6 +259,10 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
    * @param event
    */
   public onContainerClick(event: MouseEvent): void {
+    // on a rien a faire si le control est disable
+    if (this.disabled) {
+      return;
+    }
     // cette ligne dit que quand on click sur le container on simule le focus sur l'input.
     this._focusMonitor.focusVia(this._inputRef, 'program');
   }
@@ -231,6 +275,16 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   public setDescribedByIds(ids: string[]): void {
     this.userAriaDescribedBy = ids.join(' ');
   }
+
+  /**
+   * Une fonction custom qui permet de donner le status touched au blur.
+   */
+  public _onFocusOut(): void {
+    this.onTouched();
+    this.focused = false;
+    this.stateChanges.next();
+  }
+
 
   /**
    * On n'oublis surtout pas de terminer les souscriptions.

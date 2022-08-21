@@ -1,8 +1,14 @@
-<mat-select class="select" [value]="value.scope">
-  <mat-option [value]="''">Tous</mat-option>
-  <mat-option [value]="'fr'">France</mat-option>
-  <mat-option [value]="'en'">Angleterre</mat-option>
-  <mat-option [value]="'us'">États-Unis</mat-option>
-</mat-select>
-<mat-divider [vertical]="true" class="divider"></mat-divider>
-<input matInput [value]="value.query" class="input" type="text" name="advanced-search-input"/>
+<ng-container role="group" [formGroup]="form">
+  <mat-select class="select" formControlName="scope">
+    <mat-option [value]="''">Tous</mat-option>
+    <mat-option [value]="'fr'">France</mat-option>
+    <mat-option [value]="'en'">Angleterre</mat-option>
+    <mat-option [value]="'us'">États-Unis</mat-option>
+  </mat-select>
+  <mat-divider [vertical]="true" class="divider"></mat-divider>
+  <input matInput class="input"
+         (focusout)="_onFocusOut()"
+         type="text"
+         name="advanced-search-input"
+         formControlName="query"/>
+</ng-container>

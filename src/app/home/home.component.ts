@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, HostBinding, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import {
+  AdvancedSearchControlValidators,
+} from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.validators';
 
 @Component({
   selector: 'app-home',
@@ -13,10 +16,21 @@ export class HomeComponent {
 
   public form: FormGroup;
 
+  get searchCtrl(): AbstractControl | null {
+    return this.form.get('search');
+  }
+
+  get searchErrorMessage(): string | undefined {
+    if (this.searchCtrl?.hasError('required')) {
+      return 'Un nom de ville doit être renseigné.';
+    }
+    return;
+  }
+
   constructor(private _fb: FormBuilder) {
     this.form = this._fb.group({
       input: 'Une valeur',
-      search: [{ scope: '', query: 'Paris' }, []],
+      search: [{ disabled: false, value: { scope: '', query: '' } }, [AdvancedSearchControlValidators.required]],
     });
   }
 
