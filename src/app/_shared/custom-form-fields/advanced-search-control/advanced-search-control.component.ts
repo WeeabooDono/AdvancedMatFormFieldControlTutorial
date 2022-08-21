@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { FormFieldValue } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.model';
-import { AbstractControlDirective, NgControl } from '@angular/forms';
+import { AbstractControlDirective, ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
@@ -32,9 +32,14 @@ import { MatInput } from '@angular/material/input';
       provide: MatFormFieldControl,
       useExisting: AdvancedSearchControlComponent,
     },
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: AdvancedSearchControlComponent,
+      multi: true,
+    },
   ],
 })
-export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFormFieldControl<FormFieldValue> {
+export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFormFieldControl<FormFieldValue>, ControlValueAccessor {
   /**
    * Ce champ va correspondre au prochain id à ajouter à la classe de notre `AdvancedSearchControlComponent`.
    */
@@ -165,6 +170,30 @@ export class AdvancedSearchControlComponent implements OnInit, OnDestroy, MatFor
   readonly ngControl: NgControl | AbstractControlDirective | null = null;
 
   constructor(private _focusMonitor: FocusMonitor) {
+  }
+
+  /**
+   * Cette méthode va permettre de définir comment écrire les valeurs.
+   * @param obj ce qui est renvoyé par l'élément du formulaire.
+   */
+  public writeValue(obj: any): void {
+    // empty
+  }
+
+  /**
+   * Cette méthode va permettre de définir une fonction de callback pour dire qu'il y a eu un changement.
+   * @param fn la fonction de callback.
+   */
+  public registerOnChange(fn: any): void {
+    // empty
+  }
+
+  /**
+   * Cette méthode va permettre de définir une fonction de callback pour dire que le control a été touché.
+   * @param fn la fonction de callback.
+   */
+  public registerOnTouched(fn: any): void {
+    // empty
   }
 
   /**

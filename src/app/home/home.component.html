@@ -1,15 +1,17 @@
-<div class="container">
+<form class="container" [formGroup]="form" (submit)="submit()">
 
   <mat-form-field appearance="outline">
     <mat-label>Rechercher</mat-label>
     <mat-icon matPrefix>search</mat-icon>
     <mat-icon matSuffix>arrow_drop_down</mat-icon>
-    <input matInput placeholder="Commencez a écrire..." name="advanced-search-control">
+    <input matInput placeholder="Commencez a écrire..." name="advanced-search-control" formControlName="input">
   </mat-form-field>
 
 
   <mat-form-field appearance="outline">
     <mat-label>Rechercher une ville</mat-label>
-    <app-advanced-search [value]="{ scope: '', query: 'Paris'}"></app-advanced-search>
+    <app-advanced-search formControlName="search"></app-advanced-search>
   </mat-form-field>
-</div>
+
+  <button mat-raised-button>Soumettre</button>
+</form>
