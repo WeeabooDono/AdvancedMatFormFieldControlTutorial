@@ -9,6 +9,7 @@
 
 
   <mat-form-field appearance="outline">
-    <app-advanced-search></app-advanced-search>
+    <mat-label>Rechercher une ville</mat-label>
+    <app-advanced-search [value]="{ scope: '', query: 'Paris'}"></app-advanced-search>
   </mat-form-field>
 </div>
