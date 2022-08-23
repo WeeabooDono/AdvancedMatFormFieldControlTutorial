@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ContentChild, Inject, OnInit, ViewEncapsulation } from '@angular/core';
 import { WidgetInterface } from '@shared/custom-components/widget/widget.interface';
 import { WIDGET } from '@shared/custom-components/widget/widget.token';
+import { getWidgetMissingInterfaceError } from '@shared/custom-components/widget/widget.error';
 
 @Component({
   selector: 'app-widget-wrapper',
@@ -20,6 +21,13 @@ export class WidgetWrapperComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this._assertWidget();
     this.widget.load();
+  }
+
+  private _assertWidget() {
+    if (!this.widget) {
+      throw getWidgetMissingInterfaceError();
+    }
   }
 }
