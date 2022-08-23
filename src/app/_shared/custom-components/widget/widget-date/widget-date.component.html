@@ -1,0 +1,6 @@
+<mat-progress-bar
+  class="loader"
+  mode="buffer"
+  *ngIf="loading">
+</mat-progress-bar>
+<section [class.loading]="loading">{{ now() | date: 'dd MMMM YYYY à HH:mm'}}</section>

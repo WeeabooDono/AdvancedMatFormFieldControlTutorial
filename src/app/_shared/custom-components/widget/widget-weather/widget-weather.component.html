@@ -1,0 +1,23 @@
+<mat-progress-bar
+  class="loader"
+  mode="buffer"
+  *ngIf="loading">
+</mat-progress-bar>
+
+<section [class.loading]="loading">
+  <table mat-table [dataSource]="(weatherForecasts$ | async)!">
+
+    <ng-container matColumnDef="time">
+      <th mat-header-cell *matHeaderCellDef>Date et heure</th>
+      <td mat-cell *matCellDef="let row">{{row.time}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="temperature">
+      <th mat-header-cell *matHeaderCellDef>Température</th>
+      <td mat-cell *matCellDef="let row">{{row.temperature}}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</section>

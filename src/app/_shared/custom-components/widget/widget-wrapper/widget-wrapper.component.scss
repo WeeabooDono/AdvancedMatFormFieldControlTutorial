@@ -1,0 +1,15 @@
+.widget-wrapper-container {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+
+  .mat-divider {
+    margin: 10px 0;
+    color: currentColor;
+  }
+
+  .widget-wrapper-header {
+    display: flex;
+    justify-content: space-between;
+  }
+}

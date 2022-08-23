@@ -1,0 +1,10 @@
+<div class="widget-wrapper-container">
+  <div class="widget-wrapper-header">
+    <span>Un wrapper de widget</span>
+    <button mat-button color="primary" (click)="refresh()">Rafraichir</button>
+  </div>
+  <mat-divider [vertical]="false"></mat-divider>
+  <div class="widget-wrapper-content">
+    <ng-content></ng-content>
+  </div>
+</div>
