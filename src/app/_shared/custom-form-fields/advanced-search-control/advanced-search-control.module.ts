@@ -7,6 +7,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import {
+  AdvancedSearchControlRequiredDirective
+} from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.required.directive';
 
 @NgModule({
   imports: [
@@ -16,8 +19,8 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     CommonModule,
   ],
-  declarations: [AdvancedSearchControlComponent],
-  exports: [AdvancedSearchControlComponent],
+  declarations: [AdvancedSearchControlComponent, AdvancedSearchControlRequiredDirective],
+  exports: [AdvancedSearchControlComponent, AdvancedSearchControlRequiredDirective],
 })
 export class AdvancedSearchControlModule {
 }

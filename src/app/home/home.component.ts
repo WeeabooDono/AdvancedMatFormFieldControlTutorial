@@ -30,7 +30,7 @@ export class HomeComponent {
   constructor(private _fb: FormBuilder) {
     this.form = this._fb.group({
       input: 'Une valeur',
-      search: [{ disabled: false, value: { scope: '', query: '' } }, [AdvancedSearchControlValidators.required]],
+      search: [{ disabled: false, value: { scope: '', query: '' } }],
     });
   }
 
