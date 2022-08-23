@@ -70,8 +70,13 @@ const _SearchInputMixinBase = mixinErrorState(SearchInputBase);
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   /**
-   * On va dire à Angular que l'on va lui fournir un objet de type `MatFormFieldControl` à travers notre control
-   * customisé `AdvancedSearchControlComponent`.
+   * Le composant MatFormField va récupérer l'information des MatFormFieldControls à travers
+   * @ContentChild(MatFormFieldControl) _formFieldControl: MatFormFieldControl<any>;
+   * https://github.com/angular/components/blob/main/src/material/form-field/form-field.ts#L168
+   *
+   * Comme MatFormFieldControl est une classe abstraite et non concrète et qu'il est impossible de travailler avec des
+   * elements abstraits (on ne peut pas faire new MatFormFieldControl(...deps)), il nous donner la classe concrète qui
+   * va remplacer cette classe abstraite. On le fait à travers les providers.
    *
    * On ajoute un ErrorStateMatcher custom pour avoir le comportement désiré.
    */
