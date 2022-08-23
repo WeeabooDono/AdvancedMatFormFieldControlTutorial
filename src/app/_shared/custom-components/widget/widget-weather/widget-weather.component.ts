@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
-import { Widget } from '@shared/custom-components/widget/widget';
+import { WidgetInterface } from '@shared/custom-components/widget/widget.interface';
 import { HttpClient } from '@angular/common/http';
 import { map, NEVER, Observable, startWith, switchMap, timer } from 'rxjs';
+import { WIDGET } from '@shared/custom-components/widget/widget.token';
 
 interface WeatherForecast {
   time: string;
@@ -16,12 +17,12 @@ interface WeatherForecast {
   encapsulation: ViewEncapsulation.ShadowDom,
   providers: [
     {
-      provide: Widget,
+      provide: WIDGET,
       useExisting: WidgetWeatherComponent,
     },
   ],
 })
-export class WidgetWeatherComponent extends Widget {
+export class WidgetWeatherComponent implements WidgetInterface {
 
   // Paris
   static readonly LATITUDE = 48.8567;
@@ -36,7 +37,6 @@ export class WidgetWeatherComponent extends Widget {
   public displayedColumns = ['time', 'temperature'];
 
   constructor(private _cd: ChangeDetectorRef, private _http: HttpClient) {
-    super();
     this._data$ = this._http.get<any>(`https://api.open-meteo.com/v1/forecast?latitude=${ WidgetWeatherComponent.LATITUDE }&longitude=${ WidgetWeatherComponent.LONGITUDE }&hourly=temperature_2m`);
     this.weatherForecasts$ =
       timer(this.TIMER).pipe(

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
-import { Widget } from '@shared/custom-components/widget/widget';
+import { WidgetInterface } from '@shared/custom-components/widget/widget.interface';
+import { WIDGET } from '@shared/custom-components/widget/widget.token';
 
 @Component({
   selector: 'app-widget-date',
@@ -9,17 +10,16 @@ import { Widget } from '@shared/custom-components/widget/widget';
   encapsulation: ViewEncapsulation.ShadowDom,
   providers: [
     {
-      provide: Widget,
+      provide: WIDGET,
       useExisting: WidgetDateComponent,
     },
   ],
 })
-export class WidgetDateComponent extends Widget {
+export class WidgetDateComponent implements WidgetInterface {
 
   public loading = false;
 
   constructor(private _cd: ChangeDetectorRef) {
-    super();
   }
 
   public refresh(): void {

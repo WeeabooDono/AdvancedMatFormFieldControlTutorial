@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, ContentChild, OnInit, ViewEncapsulation } from '@angular/core';
-import { Widget } from '@shared/custom-components/widget/widget';
+import { ChangeDetectionStrategy, Component, ContentChild, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import { WidgetInterface } from '@shared/custom-components/widget/widget.interface';
+import { WIDGET } from '@shared/custom-components/widget/widget.token';
 
 @Component({
   selector: 'app-widget-wrapper',
@@ -10,8 +11,8 @@ import { Widget } from '@shared/custom-components/widget/widget';
 })
 export class WidgetWrapperComponent implements OnInit {
 
-  @ContentChild(Widget, { static: true })
-  public widget!: Widget;
+  @ContentChild(WIDGET, { static: true })
+  public widget!: WidgetInterface;
 
 
   public refresh(): void {
