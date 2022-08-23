@@ -1,6 +1,6 @@
 <form class="container" [formGroup]="form" (submit)="submit()">
 
-  <mat-form-field appearance="outline">
+  <mat-form-field>
     <mat-label>Rechercher</mat-label>
     <mat-icon matPrefix>search</mat-icon>
     <mat-icon matSuffix>arrow_drop_down</mat-icon>
@@ -8,7 +8,7 @@
   </mat-form-field>
 
 
-  <mat-form-field appearance="outline">
+  <mat-form-field>
     <mat-label>Rechercher une ville</mat-label>
     <mat-icon matPrefix [ngClass]="{ 'disabled-icon': searchCtrl?.disabled }">search</mat-icon>
     <app-advanced-search formControlName="search" placeholder="Rechercher..." required></app-advanced-search>

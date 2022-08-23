@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import { HttpClientModule } from '@angular/common/http';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 registerLocaleData(localeFr, 'trololo');
 
@@ -26,7 +27,9 @@ registerLocaleData(localeFr, 'trololo');
     BrowserAnimationsModule,
     HttpClientModule,
   ],
-  providers: [{ provide: LOCALE_ID, useValue: 'trololo' }],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'trololo' },
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline'}}],
   bootstrap: [AppComponent],
 })
 export class AppModule {
