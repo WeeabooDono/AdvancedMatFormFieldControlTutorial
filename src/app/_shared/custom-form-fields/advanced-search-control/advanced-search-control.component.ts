@@ -23,16 +23,19 @@ import {
   FormGroup,
   FormGroupDirective,
   NgControl,
-  NgForm,
+  NgForm, ReactiveFormsModule,
 } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { BooleanInput, coerceBooleanProperty } from '@angular/cdk/coercion';
 import { FocusMonitor, FocusOrigin } from '@angular/cdk/a11y';
-import { MatInput } from '@angular/material/input';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { ErrorStateMatcher, mixinErrorState } from '@angular/material/core';
 import {
   AdvancedSearchControlErrorStateMatcher,
 } from '@shared/custom-form-fields/advanced-search-control/advanced-search-control.error-state-matcher';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { CommonModule } from '@angular/common';
 
 class SearchInputBase {
   /**
@@ -90,6 +93,14 @@ const _SearchInputMixinBase = mixinErrorState(SearchInputBase);
       useClass: AdvancedSearchControlErrorStateMatcher,
     },
   ],
+  standalone: true,
+  imports: [
+    MatSelectModule,
+    MatDividerModule,
+    MatInputModule,
+    ReactiveFormsModule,
+    CommonModule,
+  ]
 })
 export class AdvancedSearchControlComponent
   extends _SearchInputMixinBase

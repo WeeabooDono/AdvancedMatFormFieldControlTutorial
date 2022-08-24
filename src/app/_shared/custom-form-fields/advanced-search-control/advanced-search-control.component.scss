@@ -21,4 +21,9 @@
     margin-left: calc(150px + 2rem);
     opacity: 40%;
   }
+
+  input[type=text]:disabled + .custom-advanced-search-placeholder {
+    user-select: none;
+    cursor: default;
+  }
 }

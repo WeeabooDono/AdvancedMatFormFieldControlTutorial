@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
 import { WidgetInterface } from '@shared/custom-components/widget/widget.interface';
 import { WIDGET } from '@shared/custom-components/widget/widget.token';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'app-widget-date',
@@ -13,6 +15,11 @@ import { WIDGET } from '@shared/custom-components/widget/widget.token';
       provide: WIDGET,
       useExisting: WidgetDateComponent,
     },
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatProgressBarModule,
   ],
 })
 export class WidgetDateComponent implements WidgetInterface {

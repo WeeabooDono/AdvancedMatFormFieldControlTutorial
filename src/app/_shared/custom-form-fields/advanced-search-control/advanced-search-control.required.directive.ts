@@ -11,6 +11,7 @@ import {
     useExisting: AdvancedSearchControlRequiredDirective,
     multi: true,
   }],
+  standalone: true,
 })
 export class AdvancedSearchControlRequiredDirective implements Validator {
 

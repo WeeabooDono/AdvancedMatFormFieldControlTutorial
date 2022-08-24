@@ -3,6 +3,9 @@ import { WidgetInterface } from '@shared/custom-components/widget/widget.interfa
 import { HttpClient } from '@angular/common/http';
 import { map, NEVER, Observable, startWith, switchMap, timer } from 'rxjs';
 import { WIDGET } from '@shared/custom-components/widget/widget.token';
+import { CommonModule } from '@angular/common';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
 
 interface WeatherForecast {
   time: string;
@@ -20,6 +23,12 @@ interface WeatherForecast {
       provide: WIDGET,
       useExisting: WidgetWeatherComponent,
     },
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatProgressBarModule,
+    MatTableModule,
   ],
 })
 export class WidgetWeatherComponent implements WidgetInterface {
