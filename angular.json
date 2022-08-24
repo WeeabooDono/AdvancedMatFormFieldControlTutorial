@@ -5,7 +5,15 @@
   "projects": {
     "AdvancedMatFormFieldControlTutorial": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "changeDetection": "OnPush",
+          "viewEncapsulation": "ShadowDom",
+          "standalone": true,
+          "skipTests": true,
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -103,6 +111,7 @@
     }
   },
   "cli": {
-    "analytics": "20401b76-8223-4880-a949-3ffc0f6d751d"
+    "analytics": "20401b76-8223-4880-a949-3ffc0f6d751d",
+    "packageManager": "npm"
   }
 }
